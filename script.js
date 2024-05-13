@@ -1,5 +1,5 @@
 let price = 19.5; // Replace with your actual price
-let cid = [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]];
+let cid = [["PENNY", 0.5], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]];
 document.addEventListener("DOMContentLoaded", function () {
     // Function to check if cash in drawer is sufficient for change
     function checkCashDrawer(cid, changeDue) {
@@ -25,10 +25,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let change = {};
         let changeDue = Math.round((cash - price) * 100) / 100; // Round to two decimal places
+        let cidCash = 0
+        let remainingCash
         // Loop through cash drawer in descending order of value
         for (let i = cid.length - 1; i >= 0; i--) {
             const unit = cid[i][0];
             const unitAmount = unitValues[unit];
+            cidCash += cid[i][1];
+            remainingCash = cidCash - changeDue
 
             // Keep adding units to change object until it reaches or exceeds change due
             while (changeDue >= unitAmount && cid[i][1] > 0) {
@@ -41,16 +45,28 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         // Check if exact change can be provided
+        console.log(changeDue)
+        console.log(remainingCash)
+
         if (changeDue === 0) {
-            // Format change object into a string for display
-            let changeString = "Status: OPEN ";
-            for (const unit in change) {
-                console.log(change[unit])
-                if (change[unit] > 0) {
-                    changeString += `${unit}: $${change[unit].toFixed(2)} `;
+            if (remainingCash > 0) {
+                let changeString = "Status: OPEN ";
+                for (const unit in change) {
+                    if (change[unit] > 0) {
+                        changeString += `${unit}: $${change[unit].toFixed(2)} `;
+                    }
                 }
+                return changeString.trim();
+            } else {
+                let changeString = "Status: CLOSED ";
+                for (const unit in change) {
+                    if (change[unit] > 0) {
+                        changeString += `${unit}: $${change[unit].toFixed(2)} `;
+                    }
+                }
+                return changeString.trim();
             }
-            return changeString.trim();
+
         } else {
             return "Status: INSUFFICIENT_FUNDS";
         }
